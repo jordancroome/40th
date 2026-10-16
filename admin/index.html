@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>40th Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/forty.css">
+<style>
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; position: sticky; top: 0; background: var(--paper); padding: 14px 0; z-index: 10; border-bottom: 1px solid var(--rule); }
+  .tabs button { font: inherit; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 10px 14px; border: 1.5px solid var(--rule); background: transparent; color: var(--ink); cursor: pointer; }
+  .tabs button[aria-selected=true] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .panel { padding: 36px 0 60px; }
+  .panel h2 { font-size: clamp(30px, 4vw, 44px); }
+  .inline-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin: 18px 0 28px; }
+  .inline-form label.f { flex: 1 1 160px; }
+  td input[type=text], td select { padding: 6px 8px; font-size: 14px; }
+  tr.overdue td:first-child { border-left: 3px solid var(--rust); }
+  tr.done td { color: var(--stone); }
+  tr.done .t-title { text-decoration: line-through; }
+  .cfg { display: grid; gap: 14px; max-width: 860px; }
+  .chk { width: 20px; height: 20px; accent-color: var(--moss); }
+  .yes { color: var(--moss); font-weight: 600; }
+  .no { color: var(--rust); }
+  .nowrap { white-space: nowrap; }
+</style>
+</head>
+<body>
+<main>
+  <header class="hero" style="padding-bottom:24px">
+    <p class="eyebrow">Private · Jordan only</p>
+    <h1 style="font-size:clamp(44px,8vw,96px)">40th<br><span class="accent">tracker.</span></h1>
+  </header>
+
+  <form id="login" class="form" style="max-width:520px;padding-bottom:80px">
+    <label class="f">Admin key<input type="password" id="key" autocomplete="current-password" required></label>
+    <div class="actions"><button class="btn" type="submit">Open tracker</button><span class="status" id="login-status"></span></div>
+  </form>
+
+  <div id="app" hidden>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+      <button role="tab" data-tab="crew">Hike crew</button>
+      <button role="tab" data-tab="guests">Hobart guests</button>
+      <button role="tab" data-tab="money">Money</button>
+      <button role="tab" data-tab="tasks">To-do</button>
+      <button role="tab" data-tab="config">Page text</button>
+    </nav>
+
+    <div class="panel" data-panel="overview">
+      <div class="stats" id="ov-stats"></div>
+      <div class="two-col">
+        <div>
+          <h3>Links to share</h3>
+          <ul class="plain">
+            <li><strong>Hobart page — family &amp; friends</strong><span id="hobart-url"></span><br><button class="btn small secondary" data-copy="hobart">Copy</button></li>
+            <li><strong>Hike page</strong><span>Each hiker gets their own link. They're in the Hike crew tab.</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Coming up</h3>
+          <div class="table-wrap"><table><tbody id="ov-tasks"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" data-panel="crew" hidden>
+      <h2>Hike crew</h2>
+      <p class="muted">Add each hiker, then send them their personal link on WhatsApp. New hikers get the $625 Three Capes pass logged as paid.</p>
+      <form class="inline-form" id="add-hiker">
+        <label class="f">Name<input type="text" name="name" required></label>
+        <button class="btn" type="submit">Add hiker</button>
+      </form>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Link</th><th>Flight in</th><th>Bus in / out</th><th>Hobart bed</th><th>Fri / lunch / Sat</th><th>Food</th><th>Private</th><th></th></tr></thead>
+        <tbody id="crew-rows"></tbody>
+      </table></div>
+      <div class="actions" style="margin-top:20px"><button class="btn small secondary" id="csv-crew">Download CSV</button></div>
+    </div>
+
+    <div class="panel" data-panel="guests" hidden>
+      <h2>Hobart guests</h2>
+      <p class="muted">RSVPs from the Hobart page. Add anyone who texts you instead of using the form.</p>
+      <div class="stats" id="guest-stats"></div>
+      <form class="inline-form" id="add-guest">
+        <label class="f">Name<input type="text" name="name" required></label>
+        <label class="f" style="flex:0 1 110px">Group size<input type="number" name="party_size" min="1" max="12" value="1"></label>
+        <label class="f" style="flex:0 1 150px">Lunch<select name="lunch"><option value="yes">Yes</option><option value="maybe">Maybe</option><option value="no">No</option></select></label>
+        <button class="btn" type="submit">Add guest</button>
+      </form>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Group</th><th>Lunch</th><th>Day pref</th><th>Sat dinner</th><th>Arriving</th><th>Staying</th><th>Private</th><th></th></tr></thead>
+        <tbody id="guest-rows"></tbody>
+      </table></div>
+      <div class="actions" style="margin-top:20px"><button class="btn small secondary" id="csv-guests">Download CSV</button></div>
+    </div>
+
+    <div class="panel" data-panel="money" hidden>
+      <h2>Money</h2>
+      <div class="stats" id="money-stats"></div>
+      <h3>Charge every hiker</h3>
+      <p class="muted" style="font-size:14px">For example, the Pennicott bus at $80 return. Each hiker sees what they owe on their page.</p>
+      <form class="inline-form" id="charge-all">
+        <label class="f">Item<input type="text" name="item" value="Pennicott bus (return)" required></label>
+        <label class="f" style="flex:0 1 120px">Amount $<input type="number" name="amount" step="0.01" value="80" required></label>
+        <button class="btn" type="submit">Add to all hikers</button>
+      </form>
+      <h3>Add one charge</h3>
+      <form class="inline-form" id="add-payment">
+        <label class="f">Person<select name="person_id" id="pay-person"></select></label>
+        <label class="f">Item<input type="text" name="item" required></label>
+        <label class="f" style="flex:0 1 120px">Amount $<input type="number" name="amount" step="0.01" required></label>
+        <label class="f" style="flex:0 1 120px">Status<select name="status"><option>owed</option><option>paid</option><option>waived</option></select></label>
+        <button class="btn" type="submit">Add</button>
+      </form>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Person</th><th>Item</th><th>Amount</th><th>Status</th><th>Note</th><th></th></tr></thead>
+        <tbody id="pay-rows"></tbody>
+      </table></div>
+    </div>
+
+    <div class="panel" data-panel="tasks" hidden>
+      <h2>To-do</h2>
+      <form class="inline-form" id="add-task">
+        <label class="f">Task<input type="text" name="title" required></label>
+        <label class="f" style="flex:0 1 170px">Due<input type="date" name="due"></label>
+        <button class="btn" type="submit">Add</button>
+      </form>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>Task</th><th>Due</th><th>Cost $</th><th></th></tr></thead>
+        <tbody id="task-rows"></tbody>
+      </table></div>
+    </div>
+
+    <div class="panel" data-panel="config" hidden>
+      <h2>Page text</h2>
+      <p class="muted" style="margin-bottom:24px">These show on the hike and Hobart pages. Change them here and the pages update straight away, no redeploy needed.</p>
+      <form id="cfg-form" class="cfg"></form>
+    </div>
+
+    <footer><span>forty-tassie</span><button class="btn small secondary" id="logout">Lock</button></footer>
+  </div>
+</main>
+
+<script src="../assets/forty.js"></script>
+<script>
+(function () {
+  const F = window.Forty;
+  const KEY = 'forty_admin';
+  let key = F.store.get(KEY);
+  let D = null;
+
+  const CFG = [
+    ['announcement', 'Banner across the top of both pages (blank hides it)'],
+    ['flight_rec', 'Recommended flight'],
+    ['flight_rec_note', 'Flight note'],
+    ['bus_status', 'Pennicott bus status (e.g. "Booked for 10 ✓")'],
+    ['fri_dinner', 'Friday dinner (venue + time)'],
+    ['lunch_day', 'Big lunch: day + time'],
+    ['lunch_venue', 'Big lunch: venue'],
+    ['sat_dinner', 'Saturday dinner (venue + time)'],
+    ['whatsapp_note', 'Hike page footer note']
+  ];
+
+  const base = location.origin + location.pathname.replace(/admin\/?(index\.html)?$/, '');
+  const hikeLink = t => `${base}hike/?k=${t}`;
+  const hobartLink = t => `${base}hobart/${t ? `?k=${t}` : ''}`;
+  F.$('#hobart-url').textContent = hobartLink();
+
+  F.$('#login').addEventListener('submit', async e => {
+    e.preventDefault();
+    key = F.$('#key').value.trim();
+    await load(true);
+  });
+  F.$('#logout').addEventListener('click', () => { F.store.del(KEY); location.reload(); });
+  if (key) load(false);
+
+  F.$$('.tabs button').forEach(b => b.addEventListener('click', () => {
+    F.$$('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+    F.$$('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== b.dataset.tab);
+  }));
+
+  async function load(fromLogin) {
+    try {
+      D = await F.rpc('forty_admin_dump', { p_key: key });
+    } catch (err) {
+      F.store.del(KEY);
+      F.$('#login-status').className = 'status err';
+      F.$('#login-status').textContent = fromLogin ? 'That key didn\'t work.' : '';
+      return;
+    }
+    F.store.set(KEY, key);
+    F.$('#login').hidden = true;
+    F.$('#app').hidden = false;
+    render();
+  }
+  async function act(fn, args, msg) {
+    try { await F.rpc(fn, Object.assign({ p_key: key }, args)); if (msg) F.toast(msg); await load(false); }
+    catch (err) { F.toast('Failed: ' + err.message); }
+  }
+
+  const yn = v => v === 'yes' || v === true ? '<span class="yes">Yes</span>' : v === 'no' || v === false ? '<span class="no">No</span>' : v === 'maybe' ? 'Maybe' : '<span class="muted">—</span>';
+  const money = n => '$' + Number(n || 0).toLocaleString('en-AU', { maximumFractionDigits: 2 });
+
+  function render() {
+    const hikers = D.people.filter(p => p.kind === 'hiker');
+    const guests = D.people.filter(p => p.kind === 'hobart');
+    const heads = (list, ev, val = 'yes') => list.filter(p => (p.events || {})[ev] === val).reduce((s, p) => s + (p.kind === 'hobart' ? p.party_size : 1), 0);
+    const all = D.people;
+    const owed = D.payments.filter(p => p.status === 'owed').reduce((s, p) => s + Number(p.amount), 0);
+    const paid = D.payments.filter(p => p.status === 'paid').reduce((s, p) => s + Number(p.amount), 0);
+
+    stats('#ov-stats', [
+      [hikers.length, 'Hikers'],
+      [hikers.filter(p => p.flight_in).length + '/' + hikers.length, 'Hike flights in'],
+      [hikers.filter(p => p.bus_in === true).length, 'Bus in · yes'],
+      [hikers.filter(p => p.bus_out === true).length, 'Bus out · yes'],
+      [hikers.filter(p => p.hotel).length + '/' + hikers.length, 'Hikers with a bed'],
+      [heads(all, 'fri_dinner'), 'Fri dinner'],
+      [heads(all, 'lunch'), 'Lunch · yes'],
+      [heads(all, 'lunch', 'maybe'), 'Lunch · maybe'],
+      [heads(all, 'sat_dinner'), 'Sat dinner'],
+      [money(owed), 'Owed to you']
+    ]);
+    const today = new Date().toISOString().slice(0, 10);
+    F.$('#ov-tasks').innerHTML = D.tasks.filter(t => t.status !== 'done').slice(0, 6).map(t =>
+      `<tr class="${t.due && t.due < today ? 'overdue' : ''}"><td>${F.esc(t.title)}</td><td class="nowrap">${fmtDate(t.due)}</td></tr>`).join('') || '<tr><td class="muted">All done.</td></tr>';
+
+    F.$('#crew-rows').innerHTML = hikers.map(p => `<tr>
+      <td><input type="text" value="${F.esc(p.name)}" data-rename="${p.id}" aria-label="Name"><span class="sub">${p.from_city ? 'from ' + F.esc(p.from_city) : ''}</span></td>
+      <td><button class="btn small secondary" data-copy-hike="${p.token}">Copy link</button></td>
+      <td>${F.esc(p.flight_in) || '<span class="pill warn">none</span>'}<span class="sub">${F.esc(p.arrive_at)}</span><span class="sub">${p.flight_out ? 'home: ' + F.esc(p.flight_out) + ' ' + F.esc(p.depart_at) : ''}</span></td>
+      <td>${yn(p.bus_in)} / ${yn(p.bus_out)}</td>
+      <td>${F.esc(p.hotel) || '<span class="muted">—</span>'}</td>
+      <td class="nowrap">${yn((p.events || {}).fri_dinner)} / ${yn((p.events || {}).lunch)} / ${yn((p.events || {}).sat_dinner)}</td>
+      <td>${F.esc(p.track_food) || '—'}${p.gear_need ? `<span class="sub">needs: ${F.esc(p.gear_need)}</span>` : ''}${p.gear_lend ? `<span class="sub">lends: ${F.esc(p.gear_lend)}</span>` : ''}</td>
+      <td>${F.esc(p.phone)}<span class="sub">${p.emergency_contact ? 'ICE: ' + F.esc(p.emergency_contact) : ''}</span><span class="sub">${p.dietary ? 'Diet: ' + F.esc(p.dietary) : ''}</span><span class="sub">${F.esc(p.notes)}</span></td>
+      <td><button class="btn small danger" data-del-person="${p.id}" data-name="${F.esc(p.name)}">Remove</button></td>
+    </tr>`).join('') || '<tr><td colspan="9" class="muted">No hikers yet. Add the ten above.</td></tr>';
+
+    const gHeads = guests.reduce((s, p) => s + p.party_size, 0);
+    const pref = v => guests.filter(p => (p.events || {}).lunch_pref === v).length;
+    stats('#guest-stats', [[guests.length, 'RSVPs'], [gHeads, 'Heads'], [heads(guests, 'lunch'), 'Lunch · yes'], [pref('fri') + ' / ' + pref('sat'), 'Prefer Fri / Sat']]);
+    F.$('#guest-rows').innerHTML = guests.map(p => `<tr>
+      <td><strong>${F.esc(p.name)}</strong><span class="sub">${F.esc(p.party_names)}</span><span class="sub">${p.from_city ? 'from ' + F.esc(p.from_city) : ''}</span></td>
+      <td>${p.party_size}</td>
+      <td>${yn((p.events || {}).lunch)}</td>
+      <td>${F.esc((p.events || {}).lunch_pref || '—')}</td>
+      <td>${yn((p.events || {}).sat_dinner)}</td>
+      <td>${F.esc(p.arrive_at) || '—'}<span class="sub">${p.depart_at ? 'leaving ' + F.esc(p.depart_at) : ''}</span></td>
+      <td>${F.esc(p.hotel) || '—'}</td>
+      <td>${F.esc(p.phone)}<span class="sub">${p.dietary ? 'Diet: ' + F.esc(p.dietary) : ''}</span><span class="sub">${F.esc(p.notes)}</span></td>
+      <td><button class="btn small secondary" data-copy-hobart="${p.token}">Their link</button> <button class="btn small danger" data-del-person="${p.id}" data-name="${F.esc(p.name)}">Remove</button></td>
+    </tr>`).join('') || '<tr><td colspan="9" class="muted">No RSVPs yet.</td></tr>';
+
+    const byId = Object.fromEntries(D.people.map(p => [p.id, p]));
+    stats('#money-stats', [[money(paid), 'Received'], [money(owed), 'Still owed'], [D.payments.filter(p => p.status === 'owed').length, 'Open items']]);
+    F.$('#pay-person').innerHTML = D.people.map(p => `<option value="${p.id}">${F.esc(p.name)}${p.kind === 'hobart' ? ' (Hobart)' : ''}</option>`).join('');
+    F.$('#pay-rows').innerHTML = D.payments.slice().sort((a, b) => (a.status === 'owed' ? 0 : 1) - (b.status === 'owed' ? 0 : 1)).map(x => `<tr>
+      <td>${F.esc((byId[x.person_id] || {}).name || '—')}</td>
+      <td>${F.esc(x.item)}</td>
+      <td>${money(x.amount)}</td>
+      <td><select data-pay-status="${x.id}">${['owed', 'paid', 'waived'].map(s => `<option ${s === x.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+      <td><input type="text" value="${F.esc(x.note)}" data-pay-note="${x.id}" aria-label="Note"></td>
+      <td><button class="btn small danger" data-del-pay="${x.id}">Delete</button></td>
+    </tr>`).join('') || '<tr><td colspan="6" class="muted">Nothing yet.</td></tr>';
+
+    F.$('#task-rows').innerHTML = D.tasks.map(t => `<tr class="${t.status === 'done' ? 'done' : t.due && t.due < today ? 'overdue' : ''}">
+      <td><input type="checkbox" class="chk" data-task-done="${t.id}" ${t.status === 'done' ? 'checked' : ''} aria-label="Done"></td>
+      <td><span class="t-title">${F.esc(t.title)}</span><span class="sub">${F.esc(t.detail)}</span></td>
+      <td class="nowrap">${fmtDate(t.due)}</td>
+      <td><input type="number" step="0.01" value="${t.cost == null ? '' : t.cost}" data-task-cost="${t.id}" style="width:100px" aria-label="Cost"></td>
+      <td><button class="btn small danger" data-del-task="${t.id}">Delete</button></td>
+    </tr>`).join('');
+
+    F.$('#cfg-form').innerHTML = CFG.map(([k, l]) => `<label class="f">${F.esc(l)}<input type="text" name="${k}" value="${F.esc(D.config[k] || '')}"></label>`).join('') +
+      '<div class="actions"><button class="btn" type="submit">Save page text</button></div>';
+  }
+
+  function stats(sel, items) {
+    F.$(sel).innerHTML = items.map(([n, l]) => `<div class="stat"><div class="n">${n}</div><div class="l">${F.esc(l)}</div></div>`).join('');
+  }
+  function fmtDate(d) {
+    if (!d) return '';
+    return new Date(d + 'T00:00:00').toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: '2-digit' });
+  }
+
+  // ----- actions -----
+  F.$('#add-hiker').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = e.target.name.value.trim();
+    act('forty_admin_person', { p: { kind: 'hiker', name } }, `${name} added`).then(() => e.target.reset());
+  });
+  F.$('#add-guest').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.target;
+    act('forty_admin_person', { p: { kind: 'hobart', name: f.name.value.trim(), party_size: Number(f.party_size.value) || 1, events: { lunch: f.lunch.value } } }, 'Guest added').then(() => f.reset());
+  });
+  F.$('#charge-all').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.target;
+    if (!confirm(`Add "${f.item.value}" at $${f.amount.value} to every hiker?`)) return;
+    act('forty_admin_charge_all', { p_kind: 'hiker', p_item: f.item.value.trim(), p_amount: Number(f.amount.value) }, 'Added to all hikers');
+  });
+  F.$('#add-payment').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.target;
+    act('forty_admin_payment', { p: { person_id: f.person_id.value, item: f.item.value.trim(), amount: Number(f.amount.value), status: f.status.value } }, 'Added').then(() => { f.item.value = ''; f.amount.value = ''; });
+  });
+  F.$('#add-task').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.target;
+    act('forty_admin_task', { p: { title: f.title.value.trim(), due: f.due.value } }, 'Task added').then(() => f.reset());
+  });
+  F.$('#cfg-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const changed = CFG.map(([k]) => k).filter(k => (e.target[k].value.trim()) !== (D.config[k] || ''));
+    for (const k of changed) {
+      try { await F.rpc('forty_admin_config', { p_key: key, p_k: k, p_v: e.target[k].value.trim() }); }
+      catch (err) { F.toast('Failed: ' + err.message); return; }
+    }
+    F.toast(changed.length ? 'Pages updated' : 'No changes');
+    load(false);
+  });
+
+  document.addEventListener('click', e => {
+    const t = e.target;
+    if (t.dataset.copy === 'hobart') F.copy(hobartLink());
+    if (t.dataset.copyHike) F.copy(hikeLink(t.dataset.copyHike));
+    if (t.dataset.copyHobart) F.copy(hobartLink(t.dataset.copyHobart));
+    if (t.dataset.delPerson && confirm(`Remove ${t.dataset.name}? Their answers and payments go too.`)) act('forty_admin_delete', { p_table: 'people', p_id: t.dataset.delPerson }, 'Removed');
+    if (t.dataset.delPay && confirm('Delete this payment line?')) act('forty_admin_delete', { p_table: 'payments', p_id: t.dataset.delPay }, 'Deleted');
+    if (t.dataset.delTask && confirm('Delete this task?')) act('forty_admin_delete', { p_table: 'tasks', p_id: t.dataset.delTask }, 'Deleted');
+  });
+  document.addEventListener('change', e => {
+    const t = e.target;
+    if (t.dataset.rename) act('forty_admin_person', { p: { id: t.dataset.rename, name: t.value.trim() } }, 'Saved');
+    if (t.dataset.payStatus) act('forty_admin_payment', { p: { id: t.dataset.payStatus, status: t.value } }, 'Saved');
+    if (t.dataset.payNote) act('forty_admin_payment', { p: { id: t.dataset.payNote, note: t.value } }, 'Saved');
+    if (t.dataset.taskDone) act('forty_admin_task', { p: { id: t.dataset.taskDone, status: t.checked ? 'done' : 'todo' } });
+    if (t.dataset.taskCost) act('forty_admin_task', { p: { id: t.dataset.taskCost, cost: t.value } }, 'Saved');
+  });
+
+  // ----- CSV -----
+  function csv(rows, name) {
+    const cols = Object.keys(rows[0] || {});
+    const q = v => `"${String(v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : v).replace(/"/g, '""')}"`;
+    const text = [cols.join(','), ...rows.map(r => cols.map(c => q(r[c])).join(','))].join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
+    a.download = name;
+    a.click();
+  }
+  const strip = p => { const r = Object.assign({}, p); delete r.id; delete r.token; return r; };
+  F.$('#csv-crew').addEventListener('click', () => csv(D.people.filter(p => p.kind === 'hiker').map(strip), 'hike-crew.csv'));
+  F.$('#csv-guests').addEventListener('click', () => csv(D.people.filter(p => p.kind === 'hobart').map(strip), 'hobart-guests.csv'));
+})();
+</script>
+</body>
+</html>
