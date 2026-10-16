@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Forty in Hobart · Jordan's 40th</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/forty.css">
+</head>
+<body>
+<div id="banner" class="banner" hidden></div>
+<main>
+
+  <header class="hero">
+    <p class="eyebrow">Thu 13 – Sun 16 May 2027 · Hobart</p>
+    <h1>Forty, back<br><span class="accent">in Hobart.</span></h1>
+    <p class="lead" style="max-width:780px;margin-bottom:36px">I'm turning forty on Saturday 15 May. I was born in Hobart, so that's where we're celebrating. Some of the boys are walking the Three Capes Track first. Then everyone meets in town for a long, loud late lunch. Family, friends, partners and kids all welcome.</p>
+    <dl class="hero-meta">
+      <div><dt>The main event</dt><dd>A big late lunch</dd></div>
+      <div><dt>When</dt><dd data-config="lunch_day">Friday 14 or Saturday 15 May — TBC</dd></div>
+      <div><dt>Where</dt><dd data-config="lunch_venue">A big pub or waterfront venue — TBC</dd></div>
+    </dl>
+  </header>
+
+  <figure class="hero-image">
+    <img src="../assets/salamanca.jpg" alt="Saturday markets at Salamanca Place, Hobart, with sandstone warehouses" loading="eager">
+    <figcaption>Salamanca — Saturday morning</figcaption>
+  </figure>
+
+  <!-- 01 RSVP -->
+  <section id="rsvp">
+    <div class="section-label"><span class="num">01</span><span class="title">RSVP</span></div>
+    <div class="two-col">
+      <div>
+        <h2 id="rsvp-title">Are you<br>coming?</h2>
+        <p class="muted" id="rsvp-intro">Let me know who's coming and roughly when you'll be in town, so I can book a venue big enough. You can change your answers any time.</p>
+        <div class="stats" id="counts" style="margin-top:28px"></div>
+      </div>
+      <div>
+        <div id="edit-link" class="notice ok" hidden>
+          <strong>You're on the list.</strong> This browser remembers you. To update your RSVP from another phone or computer, keep this link:
+          <div class="actions" style="margin-top:12px"><input type="text" id="edit-url" readonly aria-label="Your personal RSVP link"><button class="btn small secondary" type="button" id="copy-link">Copy</button></div>
+        </div>
+        <form id="rsvp-form" class="form" autocomplete="on">
+          <fieldset class="fieldset">
+            <legend>Who</legend>
+            <div class="row">
+              <label class="f">Your name<input type="text" name="name" required></label>
+              <label class="f">Mobile <span class="hint">Only Jordan sees this</span><input type="tel" name="phone"></label>
+            </div>
+            <div class="row">
+              <label class="f">How many in your group? <span class="hint">Including you</span><input type="number" name="party_size" min="1" max="12" value="1"></label>
+              <label class="f">Their names <span class="hint">Kids too</span><input type="text" name="party_names"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend>What you're in for</legend>
+            <div class="q">
+              <div class="q-title">The big late lunch<small><span data-config="lunch_day">Fri 14 or Sat 15 May — TBC</span></small></div>
+              <div class="choice">
+                <label><input type="radio" name="events.lunch" value="yes"><span>We'll be there</span></label>
+                <label><input type="radio" name="events.lunch" value="maybe"><span>Maybe</span></label>
+                <label><input type="radio" name="events.lunch" value="no"><span>Can't make it</span></label>
+              </div>
+            </div>
+            <div class="q">
+              <div class="q-title">If you could only do one day for the lunch<small>Helps me pick the day</small></div>
+              <div class="choice">
+                <label><input type="radio" name="events.lunch_pref" value="fri"><span>Friday</span></label>
+                <label><input type="radio" name="events.lunch_pref" value="sat"><span>Saturday</span></label>
+                <label><input type="radio" name="events.lunch_pref" value="either"><span>Either</span></label>
+              </div>
+            </div>
+            <div class="q">
+              <div class="q-title">Saturday birthday dinner<small>Smaller and more relaxed. Tell me if you're keen and I'll book for the numbers.</small></div>
+              <div class="choice">
+                <label><input type="radio" name="events.sat_dinner" value="yes"><span>Keen</span></label>
+                <label><input type="radio" name="events.sat_dinner" value="no"><span>Not this time</span></label>
+              </div>
+            </div>
+            <div class="q">
+              <div class="q-title">MONA on Friday<small>No group booking, just so people can find each other</small></div>
+              <div class="choice">
+                <label><input type="radio" name="events.mona" value="yes"><span>Going</span></label>
+                <label><input type="radio" name="events.mona" value="no"><span>Not this time</span></label>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend>Travel</legend>
+            <div class="row">
+              <label class="f">Coming from<input type="text" name="from_city" placeholder="Hobart local / Melbourne / …"></label>
+              <label class="f">Arriving <span class="hint">e.g. Thu 13 May evening</span><input type="text" name="arrive_at"></label>
+            </div>
+            <div class="row">
+              <label class="f">Staying at<input type="text" name="hotel" placeholder="Not booked yet"></label>
+              <label class="f">Leaving<input type="text" name="depart_at" placeholder="Sun 16 May afternoon"></label>
+            </div>
+            <label class="f">Dietary needs or allergies<input type="text" name="dietary" placeholder="None"></label>
+            <label class="f">Anything else<textarea name="notes"></textarea></label>
+          </fieldset>
+
+          <div class="actions">
+            <button class="btn" type="submit" id="rsvp-btn">Send my RSVP</button>
+            <span class="status" id="rsvp-status" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 THE WEEKEND -->
+  <section id="weekend">
+    <div class="section-label"><span class="num">02</span><span class="title">The weekend</span></div>
+    <h2>Four days,<br>roughly like this.</h2>
+    <p class="section-intro">Come for all of it, or just the lunch. Only the lunch is a proper group thing. Everything else is optional and you book your own.</p>
+    <div class="days">
+      <div class="day">
+        <div class="day-date">Thu 13 May<small>Arrive</small></div>
+        <div><div class="day-title">Fly in, settle in</div><p class="day-note">The hikers stagger back into town about 7pm, smelling like it. Drinks somewhere on the waterfront if you're around.</p></div>
+      </div>
+      <div class="day">
+        <div class="day-date">Fri 14 May<small>MONA day</small></div>
+        <div><div class="day-title">MONA, if you're keen</div><p class="day-note">Ferry from Brooke St Pier, about 25 minutes. The Posh Pit upgrade adds drinks and canapés. MONA entry is about $39 for interstate visitors, and you book your own. Friday night the hike crew has dinner together.</p></div>
+      </div>
+      <div class="day">
+        <div class="day-date">Fri or Sat<small>Everyone</small></div>
+        <div><div class="day-title">The big late lunch</div><p class="day-note"><span data-config="lunch_day">Day TBC</span> · <span data-config="lunch_venue">venue TBC</span>. Long tables, everyone buys their own, no speeches longer than a pint.</p></div>
+      </div>
+      <div class="day">
+        <div class="day-date">Sat 15 May<small>The birthday</small></div>
+        <div><div class="day-title">Salamanca Market and a slow day</div><p class="day-note">Market in the morning, Battery Point for a wander. Then a birthday dinner: <span data-config="sat_dinner">TBC</span>.</p></div>
+      </div>
+      <div class="day">
+        <div class="day-date">Sun 16 May<small>Home</small></div>
+        <div><div class="day-title">Brunch and fly home</div><p class="day-note">Afternoon flights to Melbourne usually leave between about 2pm and 6pm. Check the airline when you book.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 STAY -->
+  <section id="stay">
+    <div class="section-label"><span class="num">03</span><span class="title">Where to stay</span></div>
+    <h2>Book your<br>own bed.</h2>
+    <p class="section-intro">Stay near the waterfront and you can walk to everything. I'm at MACq 01. Rates below are rough guides, so check live prices for those dates. May is quiet, but don't leave it too late.</p>
+    <div class="cards">
+      <div class="card"><h5>~$200 a night</h5><div class="big">Customs House Hotel · Hotel Grand Chancellor</div><p>Customs House is on the waterfront, with a pub downstairs. The Grand Chancellor is big, easy, and has room for families.</p></div>
+      <div class="card"><h5>~$300 a night</h5><div class="big">Lenna of Hobart · Henry Jones Art Hotel</div><p>Lenna is in Salamanca. The Henry Jones is in old jam-factory warehouses on the wharf.</p></div>
+      <div class="card"><h5>$400+ a night</h5><div class="big">MACq 01 · The Tasman</div><p>Waterfront and fancy. MACq 01 entry rooms run from roughly $340–360.</p></div>
+    </div>
+  </section>
+
+  <!-- 04 THINGS TO DO -->
+  <section id="todo">
+    <div class="section-label"><span class="num">04</span><span class="title">While you're here</span></div>
+    <h2>A few things<br>worth doing.</h2>
+    <div class="places" style="margin-top:28px">
+      <figure class="place"><img src="../assets/mona.jpg" alt="Concrete tunnel entrance to MONA" loading="lazy"><div><h4>MONA</h4><p>David Walsh's strange, brilliant museum. Take the ferry, have lunch at Faro, and budget half a day.</p></div></figure>
+      <figure class="place"><img src="../assets/salamanca.jpg" alt="Salamanca Place sandstone warehouses" loading="lazy"><div><h4>Salamanca Market</h4><p>Saturday mornings on the waterfront. Food stalls, makers and very good coffee nearby.</p></div></figure>
+      <figure class="place"><img src="../assets/kunanyi.jpg" alt="kunanyi / Mt Wellington lookout over Hobart" loading="lazy"><div><h4>kunanyi / Mt Wellington</h4><p>A 30-minute drive to the summit, with the whole city below. Bring a jacket. It's colder up there than you think.</p></div></figure>
+    </div>
+  </section>
+
+  <footer>
+    <span>Jordan's 40th · Hobart, May 2027</span>
+    <span>Questions? Message Jordan.</span>
+  </footer>
+</main>
+
+<script src="../assets/forty.js"></script>
+<script>
+(async function () {
+  const F = window.Forty;
+  const KEY = 'forty_hobart';
+  let tok = F.token(KEY);
+  const form = F.$('#rsvp-form');
+  const status = F.$('#rsvp-status');
+  const btn = F.$('#rsvp-btn');
+
+  F.rpc('forty_config').then(F.applyConfig).catch(() => {});
+
+  if (tok) {
+    try {
+      const me = await F.rpc('forty_me', { p_token: tok });
+      if (me) showMe(me); else { F.store.del(KEY); tok = null; }
+    } catch (e) { /* offline or bad link: fall through to a fresh RSVP */ }
+  }
+  loadCounts();
+
+  F.$('#copy-link').addEventListener('click', () => F.copy(F.$('#edit-url').value));
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = F.clean(F.readForm(form));
+    if (!data.name) { status.className = 'status err'; status.textContent = 'Pop your name in first.'; return; }
+    btn.disabled = true;
+    status.className = 'status'; status.textContent = 'Sending…';
+    try {
+      if (tok) {
+        showMe(await F.rpc('forty_save', { p_token: tok, p: data }));
+        status.className = 'status ok'; status.textContent = 'Updated. Thanks!';
+      } else {
+        tok = await F.rpc('forty_register', { p: data });
+        F.store.set(KEY, tok);
+        history.replaceState(null, '', `?k=${encodeURIComponent(tok)}`);
+        showMe(await F.rpc('forty_me', { p_token: tok }));
+        status.className = 'status ok'; status.textContent = 'Got it — see you in Hobart.';
+      }
+      loadCounts();
+    } catch (err) {
+      status.className = 'status err'; status.textContent = 'That didn\'t send: ' + err.message;
+    } finally { btn.disabled = false; }
+  });
+
+  function showMe(me) {
+    F.fillForm(form, me);
+    btn.textContent = 'Update my RSVP';
+    F.$('#rsvp-title').innerHTML = `Thanks,<br>${F.esc(F.firstName(me.name) || 'legend')}.`;
+    F.$('#rsvp-intro').textContent = 'You\'re on the list. Plans change, so update your answers here whenever you like.';
+    F.$('#edit-link').hidden = false;
+    F.$('#edit-url').value = `${location.origin}${location.pathname}?k=${me.token}`;
+  }
+
+  async function loadCounts() {
+    let r;
+    try { r = await F.rpc('forty_roster', { p_token: tok || '' }); } catch (e) { return; }
+    const c = r.counts || {};
+    F.$('#counts').innerHTML = [[c.lunch_heads || 0, 'Coming to lunch'], [(c.hobart_heads || 0) + (c.hikers || 0), 'In Hobart so far']]
+      .map(([n, l]) => `<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  }
+})();
+</script>
+</body>
+</html>
