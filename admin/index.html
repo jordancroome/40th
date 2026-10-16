@@ -167,7 +167,10 @@
     ['whatsapp_note', 'Hike page footer note']
   ];
 
-  const base = location.origin + location.pathname.replace(/admin\/?(index\.html)?$/, '');
+  // Always share the public production address. Preview and deployment
+  // URLs sit behind Vercel's login wall, so links built from wherever the
+  // tracker happens to be open would ask guests to sign in.
+  const base = 'https://40th-alpha.vercel.app/';
   const hikeLink = t => `${base}hike/?k=${t}`;
   const hobartLink = t => `${base}hobart/${t ? `?k=${t}` : ''}`;
   F.$('#hobart-url').textContent = hobartLink();
