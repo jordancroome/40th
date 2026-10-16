@@ -43,7 +43,7 @@
         <ul class="plain" id="todo-list">
           <li><strong>1. Book the recommended flight</strong><span>Jetstar JQ701, MEL 6:00am → HBA 7:20am, Monday 10 May. Not flying from Melbourne? Fly in on Sunday night instead (see below).</span></li>
           <li><strong>2. Fill in your details below</strong><span>Flights, bus, where you're staying in Hobart, emergency contact. Takes two minutes.</span></li>
-          <li><strong>3. Book a bed for Thu 13 – Sun 16 May</strong><span>Solo rooms, book your own. Some options are in section 06.</span></li>
+          <li><strong>3. Sort your bed for Thu 13 – Sun 16 May</strong><span>Jordan will book MACq 01 for anyone who wants it. Say so in the form. Otherwise book your own; there are some options in section 06.</span></li>
         </ul>
         <div id="money" style="margin-top:32px" hidden>
           <h3>Your money</h3>
@@ -170,7 +170,22 @@
               <label><input type="radio" name="bus_out" value="false" data-bool><span>No</span></label>
             </div>
           </div>
-          <label class="f">Where you're staying in Hobart, Thu–Sun<input type="text" name="hotel" placeholder="Not booked yet"></label>
+          <div class="q">
+            <div class="q-title">How long are you staying?<small>Hike-only people: the Thursday bus gets to the airport around 6:15pm, so only fly out that night if there's a late enough flight.</small></div>
+            <div class="choice">
+              <label><input type="radio" name="events.stay" value="sunday"><span>Hike + Hobart, until Sunday</span></label>
+              <label><input type="radio" name="events.stay" value="hike_only"><span>Hike only, leaving Thursday</span></label>
+              <label><input type="radio" name="events.stay" value="other"><span>Something else (add a note below)</span></label>
+            </div>
+          </div>
+          <div class="q">
+            <div class="q-title">Want Jordan to book you a room at MACq 01?<small>Thu 13 – Sun 16 May, solo room, roughly $350+ a night. You pay Jordan back. Otherwise sort your own.</small></div>
+            <div class="choice">
+              <label><input type="radio" name="events.macq" value="yes"><span>Yes, book me in</span></label>
+              <label><input type="radio" name="events.macq" value="no"><span>No, I'll sort my own</span></label>
+            </div>
+          </div>
+          <label class="f">If you're sorting your own: where are you staying?<input type="text" name="hotel" placeholder="Not booked yet"></label>
         </fieldset>
 
         <fieldset class="fieldset">
@@ -265,7 +280,7 @@
   <section id="hobart">
     <div class="section-label"><span class="num">06</span><span class="title">Then Hobart</span></div>
     <h2>Thursday night<br>to Sunday.</h2>
-    <p class="section-intro">Book your own solo room for Thu 13 – Sun 16 May. Jordan is at MACq 01 on the waterfront. Rates below are rough guides only, so check live prices.</p>
+    <p class="section-intro">Jordan is booking rooms at MACq 01 on the waterfront for anyone who ticks "book me in" in section 03. Otherwise book your own solo room for Thu 13 – Sun 16 May. Rates below are rough guides only, so check live prices.</p>
     <div class="cards" style="margin-bottom:48px">
       <div class="card"><h5>~$200 a night</h5><div class="big">Customs House Hotel · Hotel Grand Chancellor</div><p>Customs House is right on the waterfront, with a pub downstairs. The Grand Chancellor is big and reliable.</p></div>
       <div class="card"><h5>~$300 a night</h5><div class="big">Lenna of Hobart · Henry Jones (entry rooms)</div><p>Lenna is in Salamanca. The Henry Jones is next door to MACq 01.</p></div>
@@ -356,17 +371,19 @@
     const total = ppl.length || 1;
     const onRec = ppl.filter(p => /JQ\s*701/i.test(p.flight_in)).length;
     const busIn = ppl.filter(p => p.bus_in === true).length;
-    const beds = ppl.filter(p => p.hotel).length;
+    const ev = p => p.events || {};
+    const bedLabel = p => ev(p).stay === 'hike_only' ? 'Hike only' : ev(p).macq === 'yes' ? 'MACq 01 (Jordan booking)' : p.hotel;
+    const beds = ppl.filter(p => bedLabel(p)).length;
     const flights = ppl.filter(p => p.flight_in).length;
     F.$('#crew-stats').innerHTML = [
-      [flights, 'Flights in'], [onRec, 'On JQ701'], [busIn, 'On the bus'], [beds, 'Beds booked']
+      [flights, 'Flights in'], [onRec, 'On JQ701'], [busIn, 'On the bus'], [beds, 'Bed sorted']
     ].map(([n, l]) => `<div class="stat"><div class="n">${n}<span style="font-size:16px;color:var(--stone)">/${ppl.length}</span></div><div class="l">${l}</div><div class="bar"><i style="width:${Math.round(n / total * 100)}%"></i></div></div>`).join('');
 
     F.$('#crew-rows').innerHTML = ppl.map(p => `<tr class="${p.me ? 'me' : ''}">
       <td><strong>${F.esc(p.name || '—')}</strong>${p.me ? ' <span class="pill">you</span>' : ''}${p.from_city ? `<span class="sub">from ${F.esc(p.from_city)}</span>` : ''}</td>
       <td>${p.flight_in ? F.esc(p.flight_in) : '<span class="pill warn">not yet</span>'}${p.arrive_at ? `<span class="sub">${F.esc(p.arrive_at)}</span>` : ''}</td>
       <td>${p.bus_in === true ? 'Yes' : p.bus_in === false ? 'No' : '—'}${p.bus_out === true ? '<span class="sub">+ Thu return</span>' : ''}</td>
-      <td>${p.hotel ? F.esc(p.hotel) : '<span class="muted">—</span>'}</td>
+      <td>${bedLabel(p) ? F.esc(bedLabel(p)) : '<span class="muted">—</span>'}</td>
       <td>${p.flight_out ? F.esc(p.flight_out) : '<span class="muted">—</span>'}${p.depart_at ? `<span class="sub">${F.esc(p.depart_at)}</span>` : ''}</td>
     </tr>`).join('') || '<tr><td colspan="5" class="muted">No one yet.</td></tr>';
 

@@ -75,7 +75,7 @@
         <button class="btn" type="submit">Add hiker</button>
       </form>
       <div class="table-wrap"><table>
-        <thead><tr><th>Name</th><th>Link</th><th>Flight in</th><th>Bus in / out</th><th>Hobart bed</th><th>Fri / lunch / Sat</th><th>Food</th><th>Private</th><th></th></tr></thead>
+        <thead><tr><th>Name</th><th>Link</th><th>Flight in</th><th>Bus in / out</th><th>Staying</th><th>Hobart bed</th><th>Fri / lunch / Sat</th><th>Food</th><th>Private</th><th></th></tr></thead>
         <tbody id="crew-rows"></tbody>
       </table></div>
       <div class="actions" style="margin-top:20px"><button class="btn small secondary" id="csv-crew">Download CSV</button></div>
@@ -153,6 +153,8 @@
   let key = F.store.get(KEY);
   let D = null;
 
+  const STAY = { sunday: 'Until Sun', hike_only: 'Hike only (Thu)', other: 'Other, see notes' };
+
   const CFG = [
     ['announcement', 'Banner across the top of both pages (blank hides it)'],
     ['flight_rec', 'Recommended flight'],
@@ -218,7 +220,9 @@
       [hikers.filter(p => p.flight_in).length + '/' + hikers.length, 'Hike flights in'],
       [hikers.filter(p => p.bus_in === true).length, 'Bus in · yes'],
       [hikers.filter(p => p.bus_out === true).length, 'Bus out · yes'],
-      [hikers.filter(p => p.hotel).length + '/' + hikers.length, 'Hikers with a bed'],
+      [hikers.filter(p => (p.events || {}).macq === 'yes').length, 'MACq rooms to book'],
+      [hikers.filter(p => (p.events || {}).stay === 'hike_only').length, 'Hike only'],
+      [hikers.filter(p => !(p.events || {}).stay).length, 'Stay not answered'],
       [heads(all, 'fri_dinner'), 'Fri dinner'],
       [heads(all, 'lunch'), 'Lunch · yes'],
       [heads(all, 'lunch', 'maybe'), 'Lunch · maybe'],
@@ -234,12 +238,13 @@
       <td><button class="btn small secondary" data-copy-hike="${p.token}">Copy link</button></td>
       <td>${F.esc(p.flight_in) || '<span class="pill warn">none</span>'}<span class="sub">${F.esc(p.arrive_at)}</span><span class="sub">${p.flight_out ? 'home: ' + F.esc(p.flight_out) + ' ' + F.esc(p.depart_at) : ''}</span></td>
       <td>${yn(p.bus_in)} / ${yn(p.bus_out)}</td>
-      <td>${F.esc(p.hotel) || '<span class="muted">—</span>'}</td>
+      <td>${STAY[(p.events || {}).stay] || '<span class="pill warn">?</span>'}</td>
+      <td>${(p.events || {}).macq === 'yes' ? '<span class="pill ok">MACq 01 — book</span>' : F.esc(p.hotel) || ((p.events || {}).macq === 'no' ? 'Own (TBC)' : '<span class="muted">—</span>')}</td>
       <td class="nowrap">${yn((p.events || {}).fri_dinner)} / ${yn((p.events || {}).lunch)} / ${yn((p.events || {}).sat_dinner)}</td>
       <td>${F.esc(p.track_food) || '—'}${p.gear_need ? `<span class="sub">needs: ${F.esc(p.gear_need)}</span>` : ''}${p.gear_lend ? `<span class="sub">lends: ${F.esc(p.gear_lend)}</span>` : ''}</td>
       <td>${F.esc(p.phone)}<span class="sub">${p.emergency_contact ? 'ICE: ' + F.esc(p.emergency_contact) : ''}</span><span class="sub">${p.dietary ? 'Diet: ' + F.esc(p.dietary) : ''}</span><span class="sub">${F.esc(p.notes)}</span></td>
       <td><button class="btn small danger" data-del-person="${p.id}" data-name="${F.esc(p.name)}">Remove</button></td>
-    </tr>`).join('') || '<tr><td colspan="9" class="muted">No hikers yet. Add the ten above.</td></tr>';
+    </tr>`).join('') || '<tr><td colspan="10" class="muted">No hikers yet. Add the ten above.</td></tr>';
 
     const gHeads = guests.reduce((s, p) => s + p.party_size, 0);
     const pref = v => guests.filter(p => (p.events || {}).lunch_pref === v).length;
