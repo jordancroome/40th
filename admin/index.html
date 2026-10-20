@@ -92,7 +92,7 @@
         <button class="btn" type="submit">Add guest</button>
       </form>
       <div class="table-wrap"><table>
-        <thead><tr><th>Name</th><th>Group</th><th>Lunch</th><th>Day pref</th><th>Sat dinner</th><th>Arriving</th><th>Staying</th><th>Private</th><th></th></tr></thead>
+        <thead><tr><th>Name</th><th>Group</th><th>Lunch</th><th>Sat dinner</th><th>Arriving</th><th>Staying</th><th>Private</th><th></th></tr></thead>
         <tbody id="guest-rows"></tbody>
       </table></div>
       <div class="actions" style="margin-top:20px"><button class="btn small secondary" id="csv-guests">Download CSV</button></div>
@@ -250,19 +250,17 @@
     </tr>`).join('') || '<tr><td colspan="10" class="muted">No hikers yet. Add the ten above.</td></tr>';
 
     const gHeads = guests.reduce((s, p) => s + p.party_size, 0);
-    const pref = v => guests.filter(p => (p.events || {}).lunch_pref === v).length;
-    stats('#guest-stats', [[guests.length, 'RSVPs'], [gHeads, 'Heads'], [heads(guests, 'lunch'), 'Lunch · yes'], [pref('fri') + ' / ' + pref('sat'), 'Prefer Fri / Sat']]);
+    stats('#guest-stats', [[guests.length, 'RSVPs'], [gHeads, 'Heads'], [heads(guests, 'lunch'), 'Lunch · yes'], [heads(guests, 'lunch', 'maybe'), 'Lunch · maybe']]);
     F.$('#guest-rows').innerHTML = guests.map(p => `<tr>
       <td><strong>${F.esc(p.name)}</strong><span class="sub">${F.esc(p.party_names)}</span><span class="sub">${p.from_city ? 'from ' + F.esc(p.from_city) : ''}</span></td>
       <td>${p.party_size}</td>
       <td>${yn((p.events || {}).lunch)}</td>
-      <td>${F.esc((p.events || {}).lunch_pref || '—')}</td>
       <td>${yn((p.events || {}).sat_dinner)}</td>
       <td>${F.esc(p.arrive_at) || '—'}<span class="sub">${p.depart_at ? 'leaving ' + F.esc(p.depart_at) : ''}</span></td>
       <td>${F.esc(p.hotel) || '—'}</td>
       <td>${F.esc(p.phone)}<span class="sub">${p.dietary ? 'Diet: ' + F.esc(p.dietary) : ''}</span><span class="sub">${F.esc(p.notes)}</span></td>
       <td><button class="btn small secondary" data-copy-hobart="${p.token}">Their link</button> <button class="btn small danger" data-del-person="${p.id}" data-name="${F.esc(p.name)}">Remove</button></td>
-    </tr>`).join('') || '<tr><td colspan="9" class="muted">No RSVPs yet.</td></tr>';
+    </tr>`).join('') || '<tr><td colspan="8" class="muted">No RSVPs yet.</td></tr>';
 
     const byId = Object.fromEntries(D.people.map(p => [p.id, p]));
     stats('#money-stats', [[money(paid), 'Received'], [money(owed), 'Still owed'], [D.payments.filter(p => p.status === 'owed').length, 'Open items']]);
