@@ -75,7 +75,7 @@
         <button class="btn" type="submit">Add hiker</button>
       </form>
       <div class="table-wrap"><table>
-        <thead><tr><th>Name</th><th>Link</th><th>Flight in</th><th>Bus in / out</th><th>Staying</th><th>Hobart bed</th><th>Fri / lunch / Sat</th><th>Food</th><th>Private</th><th></th></tr></thead>
+        <thead><tr><th>Name</th><th>Link</th><th>Flight in</th><th>Bus in / out</th><th>Staying</th><th>Hobart bed</th><th>Fri dinner / lunch</th><th>Food</th><th>Private</th><th></th></tr></thead>
         <tbody id="crew-rows"></tbody>
       </table></div>
       <div class="actions" style="margin-top:20px"><button class="btn small secondary" id="csv-crew">Download CSV</button></div>
@@ -92,7 +92,7 @@
         <button class="btn" type="submit">Add guest</button>
       </form>
       <div class="table-wrap"><table>
-        <thead><tr><th>Name</th><th>Group</th><th>Lunch</th><th>Sat dinner</th><th>Arriving</th><th>Staying</th><th>Private</th><th></th></tr></thead>
+        <thead><tr><th>Name</th><th>Group</th><th>Lunch</th><th>Arriving</th><th>Staying</th><th>Private</th><th></th></tr></thead>
         <tbody id="guest-rows"></tbody>
       </table></div>
       <div class="actions" style="margin-top:20px"><button class="btn small secondary" id="csv-guests">Download CSV</button></div>
@@ -163,7 +163,6 @@
     ['fri_dinner', 'Friday dinner (venue + time)'],
     ['lunch_day', 'Big lunch: day + time'],
     ['lunch_venue', 'Big lunch: venue'],
-    ['sat_dinner', 'Saturday dinner (venue + time)'],
     ['whatsapp_note', 'Hike page footer note']
   ];
 
@@ -229,7 +228,6 @@
       [heads(all, 'fri_dinner'), 'Fri dinner'],
       [heads(all, 'lunch'), 'Lunch · yes'],
       [heads(all, 'lunch', 'maybe'), 'Lunch · maybe'],
-      [heads(all, 'sat_dinner'), 'Sat dinner'],
       [money(owed), 'Owed to you']
     ]);
     const today = new Date().toISOString().slice(0, 10);
@@ -243,7 +241,7 @@
       <td>${yn(p.bus_in)} / ${yn(p.bus_out)}</td>
       <td>${STAY[(p.events || {}).stay] || '<span class="pill warn">?</span>'}</td>
       <td>${(p.events || {}).macq === 'yes' ? '<span class="pill ok">MACq 01 — book</span>' : F.esc(p.hotel) || ((p.events || {}).macq === 'no' ? 'Own (TBC)' : '<span class="muted">—</span>')}</td>
-      <td class="nowrap">${yn((p.events || {}).fri_dinner)} / ${yn((p.events || {}).lunch)} / ${yn((p.events || {}).sat_dinner)}</td>
+      <td class="nowrap">${yn((p.events || {}).fri_dinner)} / ${yn((p.events || {}).lunch)}</td>
       <td>${F.esc(p.track_food) || '—'}${p.gear_need ? `<span class="sub">needs: ${F.esc(p.gear_need)}</span>` : ''}${p.gear_lend ? `<span class="sub">lends: ${F.esc(p.gear_lend)}</span>` : ''}</td>
       <td>${F.esc(p.phone)}<span class="sub">${p.emergency_contact ? 'ICE: ' + F.esc(p.emergency_contact) : ''}</span><span class="sub">${p.dietary ? 'Diet: ' + F.esc(p.dietary) : ''}</span><span class="sub">${F.esc(p.notes)}</span></td>
       <td><button class="btn small danger" data-del-person="${p.id}" data-name="${F.esc(p.name)}">Remove</button></td>
@@ -255,12 +253,11 @@
       <td><strong>${F.esc(p.name)}</strong><span class="sub">${F.esc(p.party_names)}</span><span class="sub">${p.from_city ? 'from ' + F.esc(p.from_city) : ''}</span></td>
       <td>${p.party_size}</td>
       <td>${yn((p.events || {}).lunch)}</td>
-      <td>${yn((p.events || {}).sat_dinner)}</td>
       <td>${F.esc(p.arrive_at) || '—'}<span class="sub">${p.depart_at ? 'leaving ' + F.esc(p.depart_at) : ''}</span></td>
       <td>${F.esc(p.hotel) || '—'}</td>
       <td>${F.esc(p.phone)}<span class="sub">${p.dietary ? 'Diet: ' + F.esc(p.dietary) : ''}</span><span class="sub">${F.esc(p.notes)}</span></td>
       <td><button class="btn small secondary" data-copy-hobart="${p.token}">Their link</button> <button class="btn small danger" data-del-person="${p.id}" data-name="${F.esc(p.name)}">Remove</button></td>
-    </tr>`).join('') || '<tr><td colspan="8" class="muted">No RSVPs yet.</td></tr>';
+    </tr>`).join('') || '<tr><td colspan="7" class="muted">No RSVPs yet.</td></tr>';
 
     const byId = Object.fromEntries(D.people.map(p => [p.id, p]));
     stats('#money-stats', [[money(paid), 'Received'], [money(owed), 'Still owed'], [D.payments.filter(p => p.status === 'owed').length, 'Open items']]);
