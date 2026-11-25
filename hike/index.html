@@ -19,7 +19,7 @@
     <h1>The crew<br><span class="accent">is locked.</span></h1>
     <p class="lead" id="hello" style="max-width:760px;margin-bottom:36px">Ten of us, three capes, four days on foot, then Hobart. Your passes are paid. This page is where we sort out the rest.</p>
     <dl class="hero-meta">
-      <div><dt>Hike passes</dt><dd>Booked &amp; paid ✓</dd></div>
+      <div><dt>Hike passes</dt><dd id="pass-state">Booked &amp; paid ✓</dd></div>
       <div><dt>Boat out</dt><dd>Mon 10 May, 2:00pm</dd></div>
       <div><dt>Shuttle back</dt><dd>Thu 13 May, 2:30pm</dd></div>
     </dl>
@@ -347,8 +347,13 @@
   function render(me) {
     F.fillForm(form, me);
     const n = F.firstName(me.name);
-    if (n) F.$('#hello').textContent = `G'day ${n}. Your hike pass is paid. This page is where we sort out the rest: flights, the bus, beds and the hut kitchen.`;
     const pays = me.payments || [];
+    const pass = pays.find(p => /three capes|hike pass|track pass/i.test(p.item || ''));
+    const owed = pass && pass.status === 'owed';
+    const amt = owed ? '$' + Number(pass.amount).toLocaleString('en-AU') : '';
+    const passLine = owed ? `Your hike pass (${amt}) is still to pay.` : 'Your hike pass is paid.';
+    if (n) F.$('#hello').textContent = `G'day ${n}. ${passLine} This page is where we sort out the rest: flights, the bus, beds and the hut kitchen.`;
+    F.$('#pass-state').textContent = owed ? `${amt} to pay` : 'Booked & paid ✓';
     F.$('#money').hidden = !pays.length;
     F.$('#money-rows').innerHTML = pays.map(p => `<tr><td>${F.esc(p.item)}${p.note ? `<span class="sub">${F.esc(p.note)}</span>` : ''}</td><td>$${Number(p.amount).toLocaleString('en-AU')}</td><td><span class="pill ${p.status === 'paid' ? 'ok' : p.status === 'owed' ? 'warn' : ''}">${F.esc(p.status)}</span></td></tr>`).join('');
   }
